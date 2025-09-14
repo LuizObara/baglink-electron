@@ -1,0 +1,15 @@
+appId: "io.github.luizobara.baglink-electron"
+productName: "Baglink Desktop App"
+copyright: "Copyright (c) 2025 LuizObara"
+directories:
+  output: "release"
+  buildResources: "resources"
+win:
+  target: ["dir", "portable", "zip"]
+  icon: "resources/icon.ico"
+linux:
+  target: ["dir", "appimage", "zip"]
+  icon: "resources/icon.png"
+mac:
+  target: ["dir", "dmg", "zip"]
+  icon: "resources/icon.icns"
