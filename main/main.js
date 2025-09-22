@@ -8,12 +8,15 @@ const appServe = app.isPackaged ? serve({
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js")
     }
   });
+  
+  win.setMenuBarVisibility(false);
+  win.maximize();
 
   if (app.isPackaged) {
     appServe(win).then(() => {
@@ -21,7 +24,7 @@ const createWindow = () => {
     });
   } else {
     win.loadURL("http://localhost:3000");
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
     win.webContents.on("did-fail-load", (e, code, desc) => {
       win.webContents.reloadIgnoringCache();
     });
