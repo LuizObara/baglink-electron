@@ -8,12 +8,7 @@ import { Header } from "@/components/layout/header";
 
 export const dynamic = 'force-dynamic'
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(defaultUrl),
   title: "BagLink",
   description: "BagLink - compartilhe seus links favoritos",
 };
@@ -30,8 +25,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  // const profile = await getProfile();
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
@@ -41,13 +34,16 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex justify-center flex-1">
-              <div className="max-w-6xl 2xl:max-w-7xl container">{children}</div>
+          <div className="flex flex-col h-screen">
+            <Header className="flex-shrink-0" />
+            
+            <main className="flex-1 overflow-y-auto flex justify-center">
+              <div className="max-w-6xl 2xl:max-w-7xl container w-full">{children}</div>
             </main>
+            
             <Toaster />
-            <Footer className="mt-auto" />
+
+            <Footer className="flex-shrink-0" />
           </div>
         </ThemeProvider>
       </body>

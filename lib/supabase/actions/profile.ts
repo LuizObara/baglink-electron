@@ -1,29 +1,46 @@
 import { v4 as uuidv4 } from "uuid";
 import { Profile } from "@/types/profile";
 import { createClient } from "@/lib/supabase/client";
+import { AuthApiError } from "@supabase/supabase-js";
 
 export async function getProfile(): Promise<Profile | null> {
   const supabase = createClient();
 
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData?.user) {
-    console.error("Erro ao obter usuário:", authError);
+  try {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError) {
+      throw authError;
+    }
+    if (!authData.user) {
+      return null;
+    }
+    const { data, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", authData.user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Erro ao buscar dados na tabela de perfis:", profileError);
+      return null;
+    }
+
+    return data as Profile;
+  } catch (error) {
+    if (
+      error instanceof AuthApiError &&
+      error.message === "User from sub claim in JWT does not exist"
+    ) {
+      console.warn(
+        "Usuário fantasma detectado. Realizando logout forçado para limpar o token inválido."
+      );
+      await supabase.auth.signOut();
+    } else {
+      console.error("Erro inesperado na função getProfile:", error);
+    }
+
     return null;
   }
-
-  const { data, error } = await supabase
-    .from("users_public")
-    .select("*")
-    .eq("id_user", authData.user.id)
-    .single();
-
-
-  if (error) {
-    console.error("Erro ao buscar perfil:", error);
-    return null;
-  }
-
-  return data as Profile;
 }
 
 export async function logout() {
@@ -144,7 +161,7 @@ export async function uploadAvatar(file: File): Promise<string> {
   return urlData.publicUrl;
 }
 
-export async function uploadBanner(file:File): Promise<string> {
+export async function uploadBanner(file: File): Promise<string> {
   const supabase = createClient();
 
   const user = (await supabase.auth.getUser()).data.user;

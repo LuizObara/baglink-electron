@@ -1,41 +1,57 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useRef } from 'react';
+import { useFormStatus } from 'react-dom';
+import { addItemToBag } from '@/lib/supabase/actions/item';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Loader2, Plus } from 'lucide-react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
-export function AddItemForm({ username }: { username: string }) {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+type FormState = {
+    error?: string;
+    success?: string;
+};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url) return;
+const initialState: FormState = {};
 
-    setLoading(true);
-    await fetch("/api/items", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url, username }),
-    });
+function SubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button type="submit" size="icon" disabled={pending}>
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+        </Button>
+    );
+}
 
-    setLoading(false);
-    setUrl("");
-    router.refresh(); 
-  };
+export function AddItemForm({ bagId }: { bagId: string }) {
+    const router = useRouter();
+    const [state, formAction] = useActionState(addItemToBag, initialState);
+    const formRef = useRef<HTMLFormElement>(null);
 
-  return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <input
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder="Cole a URL do produto aqui"
-        className="border px-2 py-1 rounded-md flex-grow"
-        disabled={loading}
-      />
-      <button type="submit" disabled={loading} className="px-4 py-1 border rounded-md bg-blue-500 text-white disabled:bg-gray-400">
-        {loading ? "Adicionando..." : "Adicionar"}
-      </button>
-    </form>
-  );
+    useEffect(() => {
+        if (state?.error) {
+            toast.error("Erro", { description: state.error });
+        }
+        if (state?.success) {
+            toast.success("Sucesso", { description: state.success });
+            formRef.current?.reset();
+            router.refresh();
+        }
+    }, [state, router]);
+
+    return (
+        <form ref={formRef} action={formAction} className="flex items-center gap-2">
+            <Input
+                name="url"
+                type="url"
+                placeholder="https://loja.com.br/produto..."
+                required
+                className="flex-grow"
+            />
+            <input type="hidden" name="bagId" value={bagId} />
+            <SubmitButton />
+        </form>
+    );
 }

@@ -1,35 +1,36 @@
-import getItemsByUsername from "@/lib/supabase/actions/items"; // Ajuste o caminho se necessário
-import { ProductScraper } from "@/lib/scraper/product-scraper";
-import { ItemCard } from "@/components/bag/item-card"; // Criaremos este componente a seguir
-import { AddItemForm } from "@/components/bag/add-item-form"; // Componente para adicionar novos itens
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 type BagProps = {
-  params: Promise<{ username: string }>
+    params: { username: string }
 }
 
-export default async function BagPage({
-  params,
-}: BagProps) {
-  const { username } = await params;
+export default async function BagPage({ params }: BagProps) {
+    const { username } = await params;
+    const supabase = await createClient();
 
-  const items = await getItemsByUsername(username);
+    const { data: { session } } = await supabase.auth.getSession();
 
-  const scrapedItemsPromises = items
-    .filter((item) => item.url)
-    .map((item) => ProductScraper.scrape(item.url!));
+    if (!session) {
+        redirect("/auth/login");
+    }
 
-  const scrapedProducts = await Promise.all(scrapedItemsPromises);
+    const { data: profile, error} = await supabase.from("profiles").select("*").eq("id", session?.user.id).single();
 
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Bolsa de {username}</h1>
+    if (error) {
+        console.error("Erro ao buscar perfil:", error);
+        return <div>Ocorreu um erro ao carregar o perfil.</div>;
+    }
 
-      <div className="mt-8 grid grid-cols-1 gap-4">
-        {scrapedProducts.map((product, index) => (
-          <ItemCard key={index} product={product} />
-        ))}
-      </div>
-      <AddItemForm username={username} />
-    </div>
-  );
+    return (
+        <div className="p-8">
+            {username}
+            <hr />
+            Conteúdo de Profile: <br />
+            <pre className="text-xs font-mono p-3 rounded border max-h-[400px] overflow-auto">
+                {JSON.stringify(profile, null, 2)}
+            </pre>
+
+        </div>
+    );
 }

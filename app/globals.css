@@ -120,3 +120,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+*::-webkit-scrollbar {
+  width: 8px;  
+  height: 8px; 
+}
+
+*::-webkit-scrollbar-track {
+  background: hsl(var(--background)); 
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--border)); 
+  border-radius: 10px;
+  border: 2px solid hsl(var(--background)); 
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--primary)); 
+}
+
+* {
+  scrollbar-width: thin; 
+  scrollbar-color: hsl(var(--border)) hsl(var(--background));
+}
