@@ -34,13 +34,10 @@ import {
 
 import { ShoppingBag, LogOut, Menu, User, Loader2 } from "lucide-react";
 
-const navItems = [
-  { label: "Home", href: "/" },
-  { label: "My Bag", href: "/bag", button: true },
-];
+
 
 type HeaderProps = {
-  className?: string; 
+  className?: string;
 }
 
 export function Header({ className }: HeaderProps) {
@@ -89,6 +86,11 @@ export function Header({ className }: HeaderProps) {
       subscription?.unsubscribe();
     };
   }, []);
+
+  const navItems = [
+    { label: "Home", href: "/" },
+    { label: "My Bags", href: `/bags/${profile?.username}`, button: true },
+  ];
 
   return (
     <header

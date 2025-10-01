@@ -1,5 +1,5 @@
 import { SettingsSidebar } from "@/components/settings/settings-sidebar";
-// import ProfileCard from "@/components/profile/profile-card";
+import ProfileCard from "@/components/profile/profile-card";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -17,7 +17,7 @@ export default async function SettingsLayout({
   return (
     <div className="flex">
       <aside className="w-80 border-r px-4 py-6">
-        {/* <ProfileCard className="mb-5" /> */}
+        <ProfileCard className="mb-5" />
         <SettingsSidebar />
       </aside>
 

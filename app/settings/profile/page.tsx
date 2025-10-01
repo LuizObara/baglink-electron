@@ -1,3 +1,4 @@
+import ProfileForm from "@/components/profile/profile-form";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Profile } from "@/types/profile";
@@ -5,16 +6,16 @@ import { Profile } from "@/types/profile";
 export default async function ProfileSettingsPage() {
     const supabase = await createClient();
 
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
         redirect("/auth/login");
     }
 
     const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", session.user.id)
+        .eq("id", user.id)
         .single();
 
     if (error || !data) {
@@ -27,10 +28,10 @@ export default async function ProfileSettingsPage() {
     return (
         <>
             <h3 className="text-2xl font-bold">Edite seu Perfil</h3>
-            <pre className="text-xs font-mono p-3 mt-2 rounded border bg-slate-100 dark:bg-slate-800 max-h-[400px] overflow-auto">
+            {/* <pre className="text-xs font-mono p-3 mt-2 rounded border bg-slate-100 dark:bg-slate-800 max-h-[400px] overflow-auto">
                 {JSON.stringify(profile, null, 2)}
-            </pre>
-            {/* TODO: formulário para edição do perfil */}
+            </pre> */}
+            <ProfileForm/>
         </>
     );
 }

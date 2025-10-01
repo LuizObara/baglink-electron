@@ -23,7 +23,7 @@ export default async function BagDetailPage({ params }: BagDetailPageProps) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-shrink-0 p-4 sm:p-6 border-b">
+      <div className="flex-shrink-0 p-4 sm:p-6">
         <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl">{bag.name}</h1>
         <p className="text-muted-foreground mt-1">
           Bag de <Link href={`/bags/${username}`} className="font-semibold text-primary hover:underline">{username}</Link>
@@ -71,7 +71,7 @@ export default async function BagDetailPage({ params }: BagDetailPageProps) {
         )}
       </div>
 
-      <div className="flex-shrink-0 p-4 sm:p-6 border-t bg-background">
+      <div className="flex-shrink-0 p-4 sm:p-6 bg-background">
         <h2 className="text-lg font-semibold mb-2">Adicionar Novo Produto</h2>
         <AddItemForm bagId={bag.id} />
       </div>
